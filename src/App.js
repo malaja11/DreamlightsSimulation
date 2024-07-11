@@ -5,52 +5,47 @@ import LEDStripe from './components/LEDStripe';
 function App() {
   const animationRef = useRef();
   const [animation, setAnimation] = useState("Start");
-
-  let id = 0;
-  let inc = 1;
   const prefix = "led";
-  const diff = 100;
-  const millis = () => Date.now();
-  let last = millis();
 
-  function fx1() {
+  const myCallback = useCallback(getFx1());
 
-    if (millis() - last >= diff) {
-      let currentId = prefix + (id);
-      let current = document.getElementById(currentId);
-      if (!current) {
-        inc *= -1;
-        id += 2 * inc;
-        currentId = prefix + (id);
-        current = document.getElementById(currentId);
+  function getFx1() {
+    let id = 0;
+    let inc = 1;
+    const diff = 100;
+    const millis = () => Date.now();
+    let last = millis();
+    return () => {
+      if (millis() - last >= diff) {
+        let currentId = prefix + (id);
+        let current = document.getElementById(currentId);
+        if (!current) {
+          inc *= -1;
+          id += 2 * inc;
+          currentId = prefix + (id);
+          current = document.getElementById(currentId);
+        }
+
+        const prevId = prefix + (id - inc);
+        const prev = document.getElementById(prevId);
+        if (prev) {
+          prev.style.backgroundColor = "red";
+        }
+
+        if (current) {
+          current.style.backgroundColor = "white";
+
+          console.log(current);
+          id += inc;
+        }
+
+        last = millis();
       }
 
-      const prevId = prefix + (id - inc);
-      const prev = document.getElementById(prevId);
-      if (prev) {
-        prev.style.backgroundColor = "red";
-      }
-
-      if (current) {
-        current.style.backgroundColor = "white";
-
-        console.log(current);
-        id += inc;
-      }
-
-      last = millis();
+      animationRef.current = requestAnimationFrame(myCallback);
     }
-
   }
-
-  const myCallback = useCallback(function () {
-
-    fx1();
-
-
-    animationRef.current = requestAnimationFrame(myCallback);
-  });
-
+  
   useEffect(() => {
     if (animation === "Stop") {
       animationRef.current = requestAnimationFrame(myCallback);
