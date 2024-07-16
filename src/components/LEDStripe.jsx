@@ -2,6 +2,7 @@ import { getFx1 } from "../effects";
 import { createLEDs, moveLED } from "../functions";
 import { useCallback, useEffect, useRef, useState } from 'react';
 import useAnimation from "../hooks/useAnimation";
+import LED from "./LED";
 
 export default function LEDStripe({ count, radius, x, y, prefix }) {
 
@@ -16,7 +17,7 @@ export default function LEDStripe({ count, radius, x, y, prefix }) {
   }, true);
 
   const stripe = [...Array(count)].map((e, i) => {
-    const componentLED = <div className='led' key={i} id={prefix + i} style={{ left: currentLED.x, top: currentLED.y, width: currentLED.r * 2, height: currentLED.r * 2 }} onMouseDown={(e) => onMouseDown(e)} ></div>;
+    const componentLED = <LED key={i} id={prefix + i} x={currentLED.x} y={currentLED.y} d={currentLED.r * 2} onMouseDown={(e) => onMouseDown(e)}/>;
     currentLED = currentLED.next;
     return componentLED;
   })
