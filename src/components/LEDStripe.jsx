@@ -1,16 +1,39 @@
 import { useCallback } from "react";
 import { createLEDs, moveLED } from "../functions";
-import useAnimation from "../hooks/useAnimation";
+import * as fengari from 'fengari-web'
 import useChaser from "../hooks/useChaser";
 import LED from "./LED";
+import registerLuaFunctions from "../lua/luaFunctions";
 
 export default function LEDStripe({ count, radius, x, y, prefix }) {
 
+  const luaconf  = fengari.luaconf;
+  const lua      = fengari.lua;
+  const lauxlib  = fengari.lauxlib;
+  let lualib   = fengari.lualib;
+  let L = fengari.L;
+
+  const luaEnv = registerLuaFunctions()
+
+  fengari.load(`
+    function chaser()
+      return 1+7
+    end
+
+    function config()
+      test()
+    end
+  `)();
+  
+  lualib.luaL_openlibs(L);
+  console.log("begin");
+  console.log(lua.lua_getglobal(L, "config"));
+  console.log(lua.lua_pcall(L, 0, 1, 0));
+  console.log(lua.lua_tonumber(L, -1));
   let currentLED = createLEDs(x, y, radius, count);
   let divToDrag = null;
 
   const fx1 = useCallback((prefix, {id1, inc1}, {setId1, setInc1}) => {
-    console.log("1");
     let currentId = prefix + (id1);
     let current = document.getElementById(currentId);
     if (!current) {
@@ -37,7 +60,6 @@ export default function LEDStripe({ count, radius, x, y, prefix }) {
     setInc1(inc1);
   })
   const fx2 = useCallback((prefix, {id2, inc2}, {setId2, setInc2}) => {
-    console.log("2");
     let currentId = prefix + (id2);
     let current = document.getElementById(currentId);
     if (!current) {
