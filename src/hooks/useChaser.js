@@ -6,21 +6,12 @@ const lauxlib  = fengari.lauxlib;
 let lualib   = fengari.lualib;
 let L = fengari.L;
 
-const useChaser = (prefix, functions, variables, variablesKeys) => {
+const useChaser = (functions) => {
     const animationRef = useRef();
     const [animation, setAnimation] = useState(false);
-    let startValues = {};
-    let setStartValues = {};
-    for(const i in variablesKeys){
-        let key = variablesKeys[i];
-        const [value, setValue] = useState(variables[key]);
-        startValues[key] = value;
-        setStartValues["set" + key[0].toUpperCase() + key.substring(1)] = setValue;
-    }
-
     const [lastExecs, setLastExecs] = useState (null);
     
-    const myCallback = useCallback(getAnimation(prefix, functions, {startValues, setStartValues}, {lastExecs, setLastExecs}, animationRef, () => myCallback));
+    const myCallback = useCallback(getAnimation(functions, {lastExecs, setLastExecs}, animationRef, () => myCallback));
 
     useEffect(() => {
         if (animation) {
@@ -38,7 +29,7 @@ const useChaser = (prefix, functions, variables, variablesKeys) => {
     return { animation, setAnimation }
 }
 
-function getAnimation(prefix, functions, {startValues, setStartValues}, {lastExecs, setLastExecs}, animationRef, callback) {
+function getAnimation(functions, {lastExecs, setLastExecs}, animationRef, callback) {
     const millis = () => Date.now();
     if(lastExecs === null){
         let startLastExecs = {};

@@ -12,30 +12,55 @@ let clocks = [];
 
 
 
-function test() {
-    console.log("hello");
-    lua.lua_pushnumber(L, 7);
-    return 1;
-}
-
 function registerClock() {
-    console.log("registerClock");
+    console.log("register ");
     const func = lua.lua_tojsstring(L, 1);
-    console.log(func);
     const diff = lua.lua_tonumber(L, 2);
+    
     clocks.push({callback: func, diff: diff*10});
     
     return 1;
 }
 
-const myLib = [
-    registerClock
-]
+function addHue() {
+    const index = lua.lua_tonumber(L, 1);
+    const hue = lua.lua_tonumber(L, 2);
+    changeColor(index, hue);
+    return 1;
+}
+
+function fadeAllToBlack() {
+    const speed = lua.lua_tonumber(L, 1);
+    return 1;
+
+}
+
+function showLeds() {
+    return 1;
+}
+
+const myLib = {
+    "registerClock": registerClock,
+    "addHue": addHue,
+    "fadeAllToBlack": fadeAllToBlack,
+    "showLeds": showLeds
+
+}
+
+function changeColor(index, hue) {
+    let led = document.getElementById("led" + index);
+    console.log(led.style.backgroundColor);
+    led.style.backgroundColor = "hsl("+hue+", 100%, 50%)";
+}
+    
+
 
 export default function registerLuaFunctions() {
     lualib.luaL_openlibs(L);
-    lua.lua_register(L, "test", test);
-    lua.lua_register(L, "registerClock", registerClock)
+    for(let key in myLib){
+        console.log(key, myLib[key])
+        lua.lua_register(L, key, myLib[key]);
+    }
 }
 
 export function saveClocks() {
