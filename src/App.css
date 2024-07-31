@@ -64,3 +64,15 @@
   background-color: #b82c2c;
   border-radius: 30%;
 }
+
+.lua {
+  display: flex;
+  flex-direction: column;
+  max-width: 30%;
+  margin-top: 20px;
+  margin-left: 20px;
+}
+
+textarea {
+  height: 200px;
+}

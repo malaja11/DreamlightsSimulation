@@ -1,4 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import * as fengari from 'fengari-web'
+const luaconf  = fengari.luaconf;
+const lua      = fengari.lua;
+const lauxlib  = fengari.lauxlib;
+let lualib   = fengari.lualib;
+let L = fengari.L;
 
 const useChaser = (prefix, functions, variables, variablesKeys) => {
     const animationRef = useRef();
@@ -43,7 +49,10 @@ function getAnimation(prefix, functions, {startValues, setStartValues}, {lastExe
     return () => {
         functions.forEach(element => {
             if(millis() - lastExecs[element.callback] >= element.diff){
-                element.callback(prefix, startValues, setStartValues);
+                lua.lua_getglobal(L, element.callback);
+                lua.lua_pcall(L, 0, 1, 0);
+                lua.lua_pop(L, 1)
+                // element.callback(prefix, startValues, setStartValues);
                 lastExecs[element.callback] = millis();
             }
         });
